@@ -28,7 +28,8 @@ func _changeHealth(val,sounds):
 		healthDead = true
 		healthGui.visible = false
 		entityDied.emit()
-		queue_free()
+		if get_parent().name != "Player":
+			queue_free()
 	elif (health >= maxHealth):
 		health = maxHealth
 		if hideHealthAfterFull and healthGui.visible == true:
