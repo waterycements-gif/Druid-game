@@ -102,15 +102,16 @@ func entityDeath():
 	stunTimer.emit_signal("timeout")
 	stationary = true
 	set_collision(false)
-	if health.healthGui.get_parent() == $".":
-		health.healthGui.queue_free()
-	health.queue_free()
-	stunTimer.queue_free()
-	await get_tree().create_timer(5).timeout
-	var tween = get_tree().create_tween()
-	tween.tween_property(entitySprite,"modulate:a",0,.5)
-	await tween.finished
-	queue_free()
+	if target:
+		if health.healthGui.get_parent() == $".":
+			health.healthGui.queue_free()
+		health.queue_free()
+		stunTimer.queue_free()
+		await get_tree().create_timer(5).timeout
+		var tween = get_tree().create_tween()
+		tween.tween_property(entitySprite,"modulate:a",0,.5)
+		await tween.finished
+		queue_free()
 
 func _physics_process(delta: float) -> void:
 	if stationary == false:
