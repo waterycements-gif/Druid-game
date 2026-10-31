@@ -25,6 +25,7 @@ extends Entity
 @onready var cloneableMoveInstructions = $"Guis/Menu/Visiblity/MenuButtons/SCSK/KeysVisible/ScrollBox/VBoxContainer/Cloneable"
 @onready var SpiritKeysVisiblity = $"Guis/Menu/Visiblity/MenuButtons/SCSK/KeysVisible"
 @onready var SpiritKeyVBox = $"Guis/Menu/Visiblity/MenuButtons/SCSK/KeysVisible/ScrollBox/VBoxContainer"
+@onready var MainMenu = $"Guis/MainManu" #I realise this is misspelled but screw it I do not have enough time for this stuff ajskdjsakdjsa
 
 @onready var JKey = load("res://ScreenGUI/Jkey.png")
 @onready var IKey = load("res://ScreenGUI/Ikey.png")
@@ -56,6 +57,8 @@ var kickCd = false
 var punchStreak = 0
 var streakTimeout = 0
 var unrewardedLevelUps = 0
+
+var startingSpiritValues = [load("res://Icons/Spirits/NatureSpiritIcon.png"),"Nature Spirit",[Move.new(1,5,6,2,0,Vector2(-7,-3),Vector2(40,0),Vector2(60,90),"Wind Slash",[3],WindMagicSound,sliceSounds,1,1,[KEY_J,KEY_L],true,false,false,Vector2(),3,Vector2(400,0),"Wind Slash Projectile"),Move.new(1,10,0,-3,0,Vector2(175,8),Vector2(175,8),Vector2(300,100),"Gust",[3],WindMagicSound,null,1,1,[KEY_I,KEY_J],false,false,false,Vector2(400,0)),Move.new(1,7,8,3,2,Vector2(),Vector2(),Vector2(200,100),"Wind Shockwave",[7,8],WindMagicSound,null,1,1,[KEY_L,KEY_J],true,true,true)]]
 
 var lockedMoves = []
 
@@ -134,6 +137,40 @@ func _ready() -> void:
 	CoolDownList.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	remove_child(spiritSprites)
 	get_parent().add_child.call_deferred(spiritSprites)
+	MainMenu.get_child(1).button_down.connect(func():
+		get_parent().gameReady.emit()
+		MainMenu.visible = false
+		)
+		
+	deathScreen.get_child(2).button_down.connect(func():
+		for i in get_parent().get_children():
+			if i is Entity and i.target:
+				i.queue_free()
+		playEntityAnimation("idle")
+		adjust_health(1000)
+		unrewardedLevelUps = 0
+		punchStreak = 0
+		lockedMoves.clear()
+		selectedSpirits.clear()
+		for i:Move in startingSpiritValues[2]:
+			spiritMoves.remove_child(i)
+		for i in spiritMoves.get_children():
+			i.queue_free()
+		dead = false
+		Stunned = false
+		stationary = false
+		set_collision(true)
+		experienceBar.value = 0
+		experienceBar.max_value = 35
+		global_position = Vector2(-271,-21)
+		setDefaultSpirit(startingSpiritValues[0],startingSpiritValues[1],startingSpiritValues[2],0)
+		get_parent().gameReady.emit()
+		)
+	
+	deathScreen.get_child(3).button_down.connect(func():
+		get_tree().quit()
+		)
+	
 	menu.button_down.connect(func():
 		for i in get_parent().get_children():
 			if i is Entity and not i.originallyStationed:
@@ -171,7 +208,7 @@ func _ready() -> void:
 		i.pressed.connect(func():
 			swapSpirits(i)
 			)
-	setDefaultSpirit(load("res://Icons/Spirits/NatureSpiritIcon.png"),"Nature Spirit",[Move.new(1,5,6,2,0,Vector2(-7,-3),Vector2(40,0),Vector2(60,90),"Wind Slash",[3],WindMagicSound,sliceSounds,1,1,[KEY_J,KEY_L],true,false,false,Vector2(),3,Vector2(400,0),"Wind Slash Projectile"),Move.new(1,10,0,-3,0,Vector2(175,8),Vector2(175,8),Vector2(300,100),"Gust",[3],WindMagicSound,null,1,1,[KEY_I,KEY_J],false,false,false,Vector2(400,0)),Move.new(1,7,8,3,2,Vector2(),Vector2(),Vector2(200,100),"Wind Shockwave",[7,8],WindMagicSound,null,1,1,[KEY_L,KEY_J],true,true,true)],0)
+	setDefaultSpirit(startingSpiritValues[0],startingSpiritValues[1],startingSpiritValues[2],0)
 	
 	while true:
 		while dashUsesLeft < maxDashes:
@@ -393,6 +430,7 @@ func addNewDashBar():
 func _on_health_entity_died() -> void:
 	timer.start(1)
 	await timer.timeout
+	deathScreen.get_child(1).text = ["Man you suck", "Do better", "Just press the keys bruh", "...", "That was embarrassing", "poop"][randf_range(0,5)]
 	deathScreen.visible = true
 	
 func addButton():
