@@ -6,6 +6,12 @@ You gain moves after getting enough experience to level up, each time you level 
 
 P.S.
 the 'Deer' and 'Bear' spirits are both obtained on wave 5, its just a 50/50 whether one or the other appears 
-<img width="1920" height="1080" alt="Untitled design" src="https://github.com/user-attachments/assets/eaff84d2-556d-4f11-b4e0-29d5b0177d7d" />
+
+
+
+<img width="1391" height="777" alt="Screenshot 2026-10-31 134208" src="https://github.com/user-attachments/assets/e713f43e-37a4-4e7d-9628-925abff472c6" />
+
+
+
 
 
