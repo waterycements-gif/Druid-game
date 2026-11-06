@@ -96,12 +96,12 @@ func playEntityAnimation(animName,backwards = false,uninterupttable = false):
 
 func entityDeath():
 	health.entityDied.disconnect(entityDeath)
-	playEntityAnimation("death")
-	dead = true
 	Stunned = false
 	stunTimer.emit_signal("timeout")
 	stationary = true
 	set_collision(false)
+	playEntityAnimation("death")
+	dead = true
 	if target:
 		if health.healthGui.get_parent() == $".":
 			health.healthGui.queue_free()
@@ -182,7 +182,7 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func entityAirStun():
-	if not stunTimer:
+	if not is_instance_valid(stunTimer):
 		return
 	stationary = true
 	if entitySprite.animation != "knockedDown":
@@ -199,7 +199,7 @@ func entityAirStun():
 			playEntityAnimation("knockedDown")
 	elif stunHits == 1:
 		stunTimer.start(.5)
-	elif stunTimer:
+	else:
 		stunTimer.start(.7*(stunHits/2.0))
 	if Stunned:
 		return
