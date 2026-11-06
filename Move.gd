@@ -31,7 +31,7 @@ class_name Move extends Node
 @export var hideEntity = false
 ##Becomes stationary while attacking
 @export var stationaryWhileAttacking = false
-##Becomes able to hit knocked down enemies
+##Becomes able to hit knocked down/stunned enemies
 @export var ableToHitKnockedDown = false
 ##Determines if the 'attack sprite' is over the 'entity sprite'
 @export var overSprite = false
@@ -41,8 +41,11 @@ class_name Move extends Node
 @export var HitSound:AudioStream
 
 @export var basePitch:float
-
+##After 6 stun is stacked up, the enemy is unable to move
 @export var amountOfStun = 1
+
+@export var moveDescription:String
+
 @export_group("Bot parameters")
 ##How close the bot gets to the player
 @export var botDistanceRequired = 0
@@ -72,7 +75,7 @@ signal onCooldown()
 func _ready():
 	add_child(cooldownTimer)
 
-func _init(inputscale = 1.0, inputCd = -1.0, inputDamage = 0, inputKnockback =-1,
+func _init(inputscale = 1.0,InputmoveDescription = "", inputCd = -1.0, inputDamage = 0, inputKnockback =-1, inputamountOfStun = 1,
 	inputUpwardsKnockback = -1, inputAttackRange = Vector2(),
 	inputspiritPosition = Vector2(), inputAttackSize = Vector2(1,1),
 	inputAnimName = "",inputAttackFrame = [],
@@ -134,6 +137,10 @@ func _init(inputscale = 1.0, inputCd = -1.0, inputDamage = 0, inputKnockback =-1
 		HitSound = inputhitsound
 	if inputbasepitch > 0:
 		basePitch = inputbasepitch
+	if InputmoveDescription != "":
+		moveDescription = InputmoveDescription
+	if inputamountOfStun < 1:
+		amountOfStun = inputamountOfStun
 
 func cooldownOn():
 	cd = true
