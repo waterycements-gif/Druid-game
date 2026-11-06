@@ -39,7 +39,7 @@ extends Entity
 @onready var bangSound = load("res://Sounds/freesound_community-bang-43964.mp3")
 @onready var rockSound = load("res://Sounds/lordsonny-small-rock-break-194553 (mp3cut.net).mp3")
 @onready var sliceSounds = load("res://Sounds/dragon-studio-sword-slice-2-393845 (mp3cut.net)(1).mp3")
-@onready var testSpiritTable = [load("res://Icons/Spirits/DeerIcon.png"),"Deer",[Move.new(1.3,6,8,1,3,Vector2(30,0),Vector2(40,0),Vector2(60,50),"Ram",[2],null,punchSound,0,1,[KEY_K,KEY_L]),Move.new(1.3,10,5,1,4,Vector2(0,25),Vector2(0,0),Vector2(100,50),"Prance",[1],null,bangSound,1,1,[KEY_J,KEY_I],true,false,false,Vector2(),1,Vector2(500,0),"Prance","straight",false,true),Move.new(1.3,7.5,2,2,1,Vector2(),Vector2(),Vector2(41,13),"Radiance",[6,7,8],WindMagicSound,MagicHitSound,1,1,[KEY_I,KEY_I],true,false,true,Vector2(),5,Vector2(500,0),"RadianceArrow","straight",false,false,Vector2(35,0))]]
+@onready var grassSounds = load("res://Sounds/freesound_community-landing-on-grass-40650.mp3")
 const inputOrder := [74,75,76,73]
 const kickFrameOrder := [["kick1",7],["kick2",4],["kick3",3]]
 var input1
@@ -58,7 +58,7 @@ var punchStreak = 0
 var streakTimeout = 0
 var unrewardedLevelUps = 0
 
-var startingSpiritValues = [load("res://Icons/Spirits/NatureSpiritIcon.png"),"Nature Spirit",[Move.new(1,5,6,2,0,Vector2(-7,-3),Vector2(40,0),Vector2(60,90),"Wind Slash",[3],WindMagicSound,sliceSounds,1,1,[KEY_J,KEY_L],true,false,false,Vector2(),3,Vector2(400,0),"Wind Slash Projectile"),Move.new(1,10,0,-3,0,Vector2(175,8),Vector2(175,8),Vector2(300,100),"Gust",[3],WindMagicSound,null,1,1,[KEY_I,KEY_J],false,false,false,Vector2(400,0)),Move.new(1,7,8,3,2,Vector2(),Vector2(),Vector2(200,100),"Wind Shockwave",[7,8],WindMagicSound,null,1,1,[KEY_L,KEY_J],true,true,true)]]
+@onready var startingSpiritValues = [load("res://Icons/Spirits/NatureSpiritIcon.png"),"Nature Spirit",[Move.new(1,"Materialise a wind blade that does 6 damage and send it at your enemies. 5s cd",5,6,2,1,0,Vector2(-7,-3),Vector2(40,0),Vector2(60,90),"Wind Slash",[3],WindMagicSound,sliceSounds,1,1,[KEY_J,KEY_L],true,false,false,Vector2(),3,Vector2(400,0),"Wind Slash Projectile"),Move.new(1,"Suck in an enemy from 300px away, deals no damage. 10s cd",10,0,-3,1,0,Vector2(175,8),Vector2(175,8),Vector2(300,100),"Gust",[3],WindMagicSound,null,1,1,[KEY_I,KEY_J],false,false,false,Vector2(400,0)),Move.new(1,"Anchor yourself and 'Explode,' dealing 8 damage and a lot of knockback plus stun in an area around you. 7s cd",7,8,3,3,2,Vector2(),Vector2(),Vector2(200,100),"Wind Shockwave",[7,8],WindMagicSound,null,1,1,[KEY_L,KEY_J],true,true,true)]]
 
 var lockedMoves = []
 
@@ -80,7 +80,7 @@ func increaseExperience():
 	
 	if experienceBar.value >= experienceBar.max_value:
 		experienceBar.value = 0
-		experienceBar.max_value *= 1.2
+		experienceBar.max_value *= 1.6
 		unrewardedLevelUps+=1
 
 func InheritKeys(moveName,keys:Array):
@@ -163,6 +163,7 @@ func _ready() -> void:
 		experienceBar.value = 0
 		experienceBar.max_value = 35
 		global_position = Vector2(-271,-21)
+		deathScreen.visible = false
 		setDefaultSpirit(startingSpiritValues[0],startingSpiritValues[1],startingSpiritValues[2],0)
 		get_parent().gameReady.emit()
 		)
@@ -387,8 +388,8 @@ func addLockedMove(spiritIndex,move):
 func setDefaultSpirit(Icon,Description,SpiritMoves,ButtonIndex):
 	var KeysAndName = []
 	var skip1 = true
-	for i in SpiritMoves:
-		var moveArray = [i.keys, i.animName]
+	for i:Move in SpiritMoves:
+		var moveArray = [i.keys, i.animName,i.moveDescription]
 		i.name = i.animName
 		spiritMoves.add_child(i)
 		if skip1:
@@ -406,7 +407,7 @@ func addNewSpirit(Icon,description,attacks:Array):
 	var attackNames = []
 	var skip1 = true
 	for i in attacks:
-		var moveArray = [i.keys, i.animName]
+		var moveArray = [i.keys, i.animName,i.moveDescription]
 		spiritMoves.add_child(i)
 		i.name = i.animName
 		if skip1:
