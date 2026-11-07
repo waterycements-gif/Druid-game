@@ -77,6 +77,7 @@ func _ready() -> void:
 	player.health.entityDied.connect(func():
 		restart = true
 		AnyEnemyDied.emit()
+		allDead.emit()
 		AllEnemiesKilled = true
 		)
 	
@@ -97,7 +98,7 @@ func _ready() -> void:
 			waveNum += 1
 			endlessWaveNum += 1
 			waveLabel.text = "Wave " + str(endlessWaveNum)
-			var currentWaveValues:Array = waveValues[waveNum]
+			var currentWaveValues:Array = waveValues[waveNum].duplicate_deep()
 			if waveNum == 5 or waveNum == 10:
 				currentWaveValues = [currentWaveValues[round(randf_range(0,currentWaveValues.size()-1))]]
 				boss = currentWaveValues[0][0]
@@ -160,8 +161,8 @@ func _ready() -> void:
 				currentEnemyCount += 1
 				if maxEnemyCount <= currentEnemyCount:
 					await AnyEnemyDied
-					if restart:
-						break
+				if restart:
+					break
 				while boss and not AllEnemiesKilled:
 					var BossDistance = (instance.global_position - player.global_position)
 					if BossDistance.length() > 500:
@@ -182,6 +183,8 @@ func _ready() -> void:
 				break
 			elif boss == null:
 				await allDead
+				if restart:
+					break
 				enemiesRemainLabel.text = "You cleared the wave, Good Job"
 			else:
 				BossHealth.visible = false
@@ -190,7 +193,9 @@ func _ready() -> void:
 				enemiesRemainLabel.visible = true
 				var Bname = ""
 				player.addButton()
-				if boss == "B":
+				if restart:
+					break
+				elif boss == "B":
 					player.setDefaultSpirit(bearSpiritTable[0],bearSpiritTable[1],bearSpiritTable[2],player.selectedSpirits.size())
 					Bname = "Bear"
 				elif boss == "D":
@@ -205,7 +210,6 @@ func _ready() -> void:
 					damageMultiplier += .5
 					enemiesRemainLabel.text = "Congratuations, you killed the mantis boss and finished the game! You may exit from the menu in the top left corner, or stay to play endless where enemies get a slight bit stronger"
 			await get_tree().create_timer(4).timeout
-			
 			#I know this is super ugly but i do not have time to care, ill update this in a few months after stardance ends :)
 			if player.unrewardedLevelUps > 0:
 				if player.lockedMoves.size() > 0:
