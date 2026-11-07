@@ -100,7 +100,7 @@ func entityDeath():
 	stunTimer.emit_signal("timeout")
 	stationary = true
 	set_collision(false)
-	playEntityAnimation("death")
+	playEntityAnimation("death",false,true)
 	dead = true
 	if target:
 		if health.healthGui.get_parent() == $".":
